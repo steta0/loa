@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  img {
+    width: 50px;
+    height: 50px;
+    margin: -8px;
+    margin-bottom: -220px;
+    border: 1px transparent;
+    padding: 0px;
+    padding-bottom: -10px;
+   
+  }
+  div {
+  padding: 10px;
+  }
+  #scacchiera {
+  left: 6%;
+  position:relative;
+  width: 450px;
+  height: 450px;
+  }
+  img {
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
+    color: white;
+    background-color: transparent;
+    color: black;
+    border: 2px solid black;
+    cursor: pointer;
+    margin: 0px;
+    padding-bottom: 0px;
+    margin-bottom: -5px;
+  }
+  
+</style>
+</head>
+<body>
+ <div id = upperbar></div>
+ <div id = justbar></div>
+ <div id = scacchiera></div>
+	
+	
+<script>
+
+var turn = 0;
+var fase = 0;
+var tuttecas = undefined;
+var backupstate = [];
+var backupturn = [];
+var backupfase = [];
+var nbackup = -1;
+
+const images = [["https://i.imgur.com/GOiKbNQ.jpg","https://i.imgur.com/nebwIrq.jpg","https://i.imgur.com/yhZi9WM.jpg"],["https://i.imgur.com/ULngdQh.jpg","https://i.imgur.com/QCXnZ6b.jpg","https://i.imgur.com/q7lobLH.jpg"]];
+const lettera = ['a','b','c','d','e','f','g','h'];
+const numero = ['1','2','3','4','5','6','7','8'];
+const colore = ['black','white'];
+
+document.addEventListener("DOMContentLoaded", function() {
+		let riga = 0;
+		let colonna = 0;
+	lettera.forEach(function(lett) {
+	colonna = 0;
+		numero.forEach(function(num) {
+	let casella = document.createElement("img");
+			casella.src = images [(riga+colonna)%2][0];
+			let imageContainer = document.getElementById("scacchiera");
+        	imageContainer.appendChild(casella);
+	        let posizione = lett + num;
+	        let dposizionea = riga - colonna + 7;
+	        let colonnab = [7,6,5,4,3,2,1,0];
+	        let rigab = [7,6,5,4,3,2,1,0];
+	        let dposizioneb = colonnab [colonna] - riga + 7;
+	        casella.setAttribute("riga", riga);
+	        casella.setAttribute("colonna", colonna);
+	        casella.setAttribute("da", dposizionea);
+	        casella.setAttribute("db", dposizioneb);
+        	casella.setAttribute("id", posizione);
+        	casella.setAttribute('did', dposizionea + dposizioneb);
+			casella.setAttribute("onclick", "changeColor('" + posizione + "')");
+        	casella.setAttribute("class", colore [(riga+colonna)%2]);
+        	casella.setAttribute("puo", false);
+colonna++ }); 
+	riga++}); 
+	let tutteca = document.querySelectorAll("img");
+	tuttecas = Array.from(tutteca);});
+	
+function gameset () {
+		let riga = 0;
+		let colonna = 0;
+	lettera.forEach(function(lett) {
+	colonna = 0;
+		numero.forEach(function(num) {
+	let casa = document.getElementById (lett + num);
+	casa.src = images [( riga + colonna ) %2][0];
+	casa.setAttribute('state', 0);
+	turn = 0;
+	fase = 0;
+colonna++});
+	riga++});
+	backup ();
+	}
+
+	var bloa = document.createElement("button");
+	var upperbar = document.getElementById("upperbar");
+	bloa.innerHTML = "loa";
+	upperbar.appendChild(bloa);
+	bloa.setAttribute("onclick", "startingloa()");
+	
+	/*var bdama = document.createElement("button");
+	var upperbar = document.getElementById("upperbar");
+	bdama.innerHTML = "dama";
+	upperbar.appendChild(bdama);
+	bdama.setAttribute("onclick", "startingdama()");*/
+	
+	/*var bfree = document.createElement("button");
+	var bar = document.getElementById("upperbar");
+	bfree.innerHTML = "free";
+	upperbar.appendChild(bfree);
+	bfree.setAttribute("onclick", "startfree ()");*/
+	
+	var bret = document.createElement("button");
+	var bar = document.getElementById("justbar");
+	bret.innerHTML = "retry";
+	justbar.appendChild(bret);
+	bret.setAttribute("onclick", "retry ()");
+	
+	function backup () {
+		let riga = 0;
+		let colonna = 0;
+		let prestate = [];
+	lettera.forEach(function(lett) {
+	colonna = 0;
+		numero.forEach(function(num) {
+	let casa = document.getElementById ( lett + num );
+	let back = casa.getAttribute('state');
+	prestate.push(back);
+colonna++ });
+	riga++ });
+	backupstate.push(prestate);
+	backupturn.push(turn);
+	backupfase.push(fase);
+	nbackup++
+	}
+	
+	function retry () {
+	if (nbackup>1) {
+		let riga = 0;
+		let colonna = 0;
+		let nc = 0;
+		nbackup--
+	lettera.forEach(function(lett) {
+	colonna = 0;
+		numero.forEach(function(num) {
+	let bake = document.getElementById ( lett + num );
+	bake.src = images [(riga+colonna)%2][backupstate[nbackup][nc]];
+	bake.setAttribute ('state', backupstate[nbackup][nc])
+	colonna++ 
+	nc++ });
+	riga++ });
+	turn = backupturn[nbackup];
+	fase = backupfase[nbackup];
+	backupfase.pop();
+	backupturn.pop();
+	backupstate.pop();
+	passfase();
+	}}
+	
+	function passfase (csatt) {
+		if (fase == 0) {
+		let riga = 0
+		lettera.forEach(function(lett) {
+	colonna = 0;
+		numero.forEach(function(num) {
+	let casa = document.getElementById ( lettera [riga] + numero [colonna] );
+	let state = casa.getAttribute ('state')
+	if (state == turn+1) {
+	casa.setAttribute("puo", 1);
+	casa.style.border = '2px solid red'
+	} else {
+	casa.setAttribute("puo", 0);
+	casa.style.border = '2px solid black'}
+colonna++ });
+	riga++ });
+		}
+		else {
+		let riga = 0;
+		lettera.forEach(function(lett) {
+	colonna = 0;
+		numero.forEach(function(num) {
+	let casa = document.getElementById ( lett + num );
+	casa.style.border = '2px solid black'
+	casa.setAttribute("puo", 0);
+colonna++ });
+	riga++ });
+	csatt.style.border = '2px solid yellow'
+	csatt.setAttribute("puo", 0);
+	for (var g = 3; g >= 0; g--) {
+	mossa (g,csatt);
+	}
+		}
+		}
+	function mossa (direzione,csatt) {
+	let error = 0;
+	let errorr = 0;
+	let colonna = ['colonna','riga','db','da'];
+	let makefila = [csatt.getAttribute ('riga'),csatt.getAttribute ('colonna'),csatt.getAttribute ('da'),csatt.getAttribute ('db')];
+	let x = 0
+	if (direzione%2 == 0){
+	x = +1}
+	else {x = -1}
+	let stessariga = document.querySelectorAll('[' + colonna [direzione] + ' ="'+ makefila [ direzione + x ] +'"]');
+	stessariga = Array.from(stessariga);
+		let counter = 1;
+		for (let i = 0; i < stessariga.length; i++) {
+  			let elemento = stessariga[i];
+  			let na1 = elemento.getAttribute ('state');
+			if (na1 != 0) {counter++} }
+		let posi = stessariga.indexOf(csatt);
+		posi = parseInt(posi);
+		movibile = stessariga [posi + counter]
+ for (let i = (counter-1); i > 0; i--) {
+ let ceck = stessariga [posi + i]
+ if (ceck != null) {
+ let c = ceck.getAttribute ('state');
+ if ( c != turn+1 && c!=0) { error++}
+ }}  
+ if (movibile != null && error == 0 ) {
+   let nonmia = movibile.getAttribute('state');
+   if (nonmia == 0 || nonmia != turn+1) {
+  	movibile.setAttribute("puo", 1);
+  movibile.style.border = '2px solid orange';}
+}
+let posir = stessariga.indexOf(csatt);
+		posir = parseInt(posi);
+		movibiler = stessariga [posir - counter]
+ for (let i = (counter-1); i > 0; i--) {
+ let ceckr = stessariga [posir - i]
+ if (ceckr != null) {
+ let cr = ceckr.getAttribute ('state');
+ if ( cr != turn+1 && cr !=0) { errorr++}
+ }}
+ if (movibiler != null && errorr == 0 ) {    
+ let nonmiar = movibiler.getAttribute('state');
+ if (nonmiar == 0 || nonmiar != turn + 1) {
+ 	movibiler.setAttribute("puo", 1);
+  movibiler.style.border = '2px solid orange';}
+}
+	}
+	
+	function passturn () {
+		let intorno = []
+		let primacas = undefined;
+		let pedine = 0;
+	tuttecas.forEach(function(cas){
+		let stato = cas.getAttribute ('state');
+		if (stato == turn+1) {
+			pedine++;
+		}; 
+	cas.setAttribute('preso', 0);
+
+	});
+		for (let dio = 63, prima = 0; dio >= 0 && prima == 0; dio--) {
+			let cas = tuttecas [dio];
+			let stato = cas.getAttribute ('state');
+			if (stato == turn+1) {
+				prima ++;
+				primacas = cas; } }
+	function vittoria (cas) {
+		let colonna = ['colonna','riga','db','da'];
+		let makefila = [cas.getAttribute ('riga'),cas.getAttribute ('colonna'),cas.getAttribute ('da'),cas.getAttribute ('db')];
+		for (let direzione = 3; direzione >= 0; direzione--) {
+			let x = 0
+			if (direzione%2 == 0){
+				x = +1}
+			else {x = -1}
+			let stessariga = document.querySelectorAll('[' + colonna [direzione] + ' ="'+ makefila [ direzione + x] +'"]');
+			stessariga = Array.from(stessariga);
+			let pos = stessariga.indexOf(cas);
+			let caswin = stessariga [pos + 1];
+			let caswinn =  stessariga [pos - 1];
+			let vince = undefined;
+			let vincee = undefined;
+			let presio = undefined;
+			let presioo = undefined;
+			if (caswin != null){
+				 vince = caswin.getAttribute ('state');
+				 presio = caswin.getAttribute ('preso');}
+			if (caswinn != null){
+				 vincee = caswinn.getAttribute ('state');
+				 presioo = caswinn.getAttribute ('preso');}
+			if (vince == turn + 1 && presio == 0) {
+				intorno.push (caswin)
+				}
+			if (vincee == turn + 1 && presioo == 0) {
+				intorno.push (caswinn)} 
+		} primacas.setAttribute ('preso', 1);
+		intorno.forEach(function(cas){
+			let preso = cas.getAttribute ('preso');
+			if (preso == 0) {
+				cas.setAttribute ('preso', 1);
+			vittoria (cas);}
+			}); 
+
+	};
+	intorno.push (primacas);
+	vittoria (primacas);
+	let setintorno = new Set(intorno);
+	let nintorno = Array.from(setintorno);
+	let unite = nintorno.length; 
+	let colore = ['bianco','nero']
+	if (unite == pedine ) {
+		alert('ha vinto il ' + colore [turn]);
+	}
+
+	fase = 0;
+	turn++;
+	turn = turn%2;
+	backup ();
+	}
+	
+	function startfree () {
+	gameset ();
+	backup ();}
+	
+	/*function startingdama () {
+	gameset ();
+	let sc = 0;
+	let castart = ['a7','a5', 'a3', 'a1', 'b8','b6','b4','b2','c1','c3','c5','c7']; 
+	for (let elemento of castart) {
+		sc++;
+		let img = document.getElementById(elemento);
+		img.src = images[0][1];
+		img.setAttribute('state', 1);
+		}
+	let castar = ['f8','f6', 'f4', 'f2', 'h8','h6','h4','h2','g1','g3','g5','g7']; 
+	for (let elemento of castar) {
+		sc++;
+		let img = document.getElementById(elemento);
+		img.src = images[0][2];
+		img.setAttribute('state', 2);
+	}backup ();
+	}*/
+	
+	function startingloa() {
+	gameset ();
+	let sc = 0;
+	let castart = ['a7', 'a6', 'a5', 'a4','a3','a2','b1','b8','c1','c8','d1','d8','e1','e8','f1','f8','g1','g8','h2','h3','h4','h5','h6','h7']; 
+	for (let elemento of castart) {
+		sc++;
+		if (sc<7||sc>18) {
+			ssc = 1; }
+		else {
+			ssc = 2;
+		}
+		let img = document.getElementById(elemento);
+		if (img.classList.contains("black")) {
+			var c = 0;}
+		else {var c = 1;}
+	img.src = images[c][ssc];
+	img.setAttribute('state', ssc);
+	}backup ();
+	passfase ();
+	}
+	
+function changeColor(ncas) {
+    let img = document.getElementById(ncas);
+    let puo = img.getAttribute('puo');
+    if (puo == 1 ) {
+	let statoc = img.getAttribute('state');
+	if (img.classList.contains("black")) {
+			var c = 0;}
+		else {var c = 1;}
+	if (fase == 0) {
+	if (statoc == turn+1) {
+  img.src = images[c][0];
+  img.setAttribute('state', 0);
+  fase++
+  passfase (img);
+  } }
+  else if (fase == 1) {
+  if (statoc !== turn+1){
+  img.src = images[c][turn+1];
+  img.setAttribute('state', turn+1);
+  passturn ();
+  passfase(img);
+  }
+  }
+  }
+}
+	
+</script>
+
+</body>
+</html>
